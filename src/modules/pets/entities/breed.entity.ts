@@ -22,7 +22,7 @@ export class Breed {
   animalType: AnimalType;
 
   @Column()
-  animalTypeId: string;
+  animalTypeId: number;
 
   @OneToMany(() => Pet, (pet) => pet.breed)
   pets: Pet[];

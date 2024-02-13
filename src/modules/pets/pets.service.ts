@@ -1,16 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { CreateAnimalTypeDto } from './dto/create-type.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AnimalType } from './entities';
-import { Repository } from 'typeorm';
+import { AnimalType, Breed } from './entities';
+import { CreateBreedDto } from './dto/create-breed.dto';
 
 @Injectable()
 export class PetsService {
   constructor(
     @InjectRepository(AnimalType)
     private readonly animalTypeRepository: Repository<AnimalType>,
+    @InjectRepository(Breed)
+    private readonly breedRepository: Repository<Breed>,
   ) {}
 
   create(createPetDto: CreatePetDto) {
@@ -33,20 +37,31 @@ export class PetsService {
     return `This action removes a #${id} pet`;
   }
 
-  addBreed() {}
-
-  async animalTypeExists(animalType: string) {
-    return await this.animalTypeRepository.exists({
-      where: { name: animalType },
-    });
+  animalTypeExists(where: FindOptionsWhere<AnimalType>) {
+    return this.animalTypeRepository.exists({ where });
   }
 
-  async getAnimalTypes() {
+  getAnimalTypes() {
     return this.animalTypeRepository.find();
   }
 
-  async addAnimalType(createAnimalTypeDto: CreateAnimalTypeDto) {
+  addAnimalType(createAnimalTypeDto: CreateAnimalTypeDto) {
     const newType = this.animalTypeRepository.create(createAnimalTypeDto);
-    return await this.animalTypeRepository.save(newType);
+    return this.animalTypeRepository.save(newType);
+  }
+
+  breedExists(breed: string) {
+    return this.breedRepository.exists({
+      where: { name: breed },
+    });
+  }
+
+  getBreeds() {
+    return this.breedRepository.find();
+  }
+
+  addBreed(createBreedDto: CreateBreedDto) {
+    const newBreed = this.breedRepository.create(createBreedDto);
+    return this.breedRepository.save(newBreed);
   }
 }
