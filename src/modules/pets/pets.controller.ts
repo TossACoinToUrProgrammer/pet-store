@@ -23,7 +23,31 @@ export class PetsController {
   constructor(private readonly petsService: PetsService) {}
 
   @Post()
-  create(@Body() createPetDto: CreatePetDto) {
+  async create(@Body(new ValidationPipe()) createPetDto: CreatePetDto) {
+    if (createPetDto.breedId) {
+      const breedExists = await this.petsService.breedExists({
+        id: createPetDto.breedId,
+      });
+      if (!breedExists) {
+        throw new HttpException(
+          'Breed with this id doesnt exist',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+    }
+
+    if (createPetDto.animalTypeId) {
+      const typeExists = await this.petsService.animalTypeExists({
+        id: createPetDto.animalTypeId,
+      });
+      if (!typeExists) {
+        throw new HttpException(
+          'Animal type with this id doesnt exist',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+    }
+
     return this.petsService.create(createPetDto);
   }
 
@@ -61,7 +85,9 @@ export class PetsController {
 
   @Post('/breeds')
   async addBreed(@Body(new ValidationPipe()) createBreedDto: CreateBreedDto) {
-    const breedExists = await this.petsService.breedExists(createBreedDto.name);
+    const breedExists = await this.petsService.breedExists({
+      name: createBreedDto.name,
+    });
 
     if (breedExists) {
       throw new HttpException(

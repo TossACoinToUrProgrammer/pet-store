@@ -5,7 +5,7 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
 import { CreateAnimalTypeDto } from './dto/create-type.dto';
-import { AnimalType, Breed } from './entities';
+import { AnimalType, Breed, Pet } from './entities';
 import { CreateBreedDto } from './dto/create-breed.dto';
 
 @Injectable()
@@ -15,22 +15,21 @@ export class PetsService {
     private readonly animalTypeRepository: Repository<AnimalType>,
     @InjectRepository(Breed)
     private readonly breedRepository: Repository<Breed>,
+    @InjectRepository(Pet)
+    private readonly petRepository: Repository<Pet>,
   ) {}
 
   create(createPetDto: CreatePetDto) {
-    return 'This action adds a new pet';
+    const newPet = this.petRepository.create(createPetDto);
+    return this.petRepository.save(newPet);
   }
 
   findAll() {
-    return `This action returns all pets`;
+    return this.petRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} pet`;
-  }
-
-  update(id: number, updatePetDto: UpdatePetDto) {
-    return `This action updates a #${id} pet`;
+    return this.petRepository.findOne({ where: { id } });
   }
 
   remove(id: number) {
@@ -50,10 +49,8 @@ export class PetsService {
     return this.animalTypeRepository.save(newType);
   }
 
-  breedExists(breed: string) {
-    return this.breedRepository.exists({
-      where: { name: breed },
-    });
+  breedExists(where: FindOptionsWhere<Breed>) {
+    return this.breedRepository.exists({ where });
   }
 
   getBreeds() {
@@ -63,5 +60,9 @@ export class PetsService {
   addBreed(createBreedDto: CreateBreedDto) {
     const newBreed = this.breedRepository.create(createBreedDto);
     return this.breedRepository.save(newBreed);
+  }
+
+  update(...args: any) {
+
   }
 }

@@ -13,20 +13,22 @@ export class Pet {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: false })
+  name: string;
+
   @Column({ nullable: true })
   image: string;
 
-  @Column()
+  @Column({ nullable: false })
   price: number;
-  
+
   @ManyToOne(() => AnimalType, (animalType) => animalType.pets)
   @JoinColumn({ name: 'animalTypeId' })
   animalType: AnimalType;
 
   @Column({ nullable: true })
-  animalTypeId: string;
+  animalTypeId?: number;
 
-  
   @ManyToOne(() => Breed, (breed) => breed.pets, {
     onDelete: 'SET NULL',
     nullable: true,
@@ -35,5 +37,5 @@ export class Pet {
   breed: Breed | null;
 
   @Column({ nullable: true })
-  breedId: string | null;
+  breedId?: number;
 }
